@@ -9,6 +9,7 @@ services:
       - ./angie.conf:/etc/angie/angie.conf
       - ./options-ssl-angie.conf:/etc/angie/options-ssl-angie.conf
       - 3x-ui-aio-volume:/var/lib/angie/acme/
+      - ./web-stub/:/var/www/stub/
     networks:
       - 3x-ui-aio-network
     restart: unless-stopped
@@ -22,13 +23,6 @@ services:
       XRAY_VMESS_AEAD_FORCED: "false"
       X_UI_ENABLE_FAIL2BAN: "false"
     tty: true
-    networks:
-      - 3x-ui-aio-network
-    restart: unless-stopped
-
-  authorization-stub:
-    image: ampetelin/authorization-stub:latest
-    container_name: authorization-stub
     networks:
       - 3x-ui-aio-network
     restart: unless-stopped
