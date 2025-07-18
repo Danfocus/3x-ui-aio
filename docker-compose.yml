@@ -1,15 +1,16 @@
 services:
   angie:
-    image: docker.angie.software/angie:1.9.1
+    image: docker.angie.software/angie:1.10.1-templated
     container_name: angie
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
     volumes:
-      - ./angie.conf:/etc/angie/angie.conf
+      - ./angie.conf:/etc/angie/templates/angie.conf
       - ./options-ssl-angie.conf:/etc/angie/options-ssl-angie.conf
       - 3x-ui-aio-volume:/var/lib/angie/acme/
       - ./web-stub/:/var/www/stub/
+    env_file: ./angie.env
     networks:
       - 3x-ui-aio-network
     restart: unless-stopped

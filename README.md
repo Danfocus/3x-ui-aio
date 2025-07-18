@@ -20,7 +20,7 @@ A-записи этих поддоменов должны содержать IP 
 git clone https://github.com/Danfocus/3x-ui-aio.git && cd 3x-ui-aio
 ```
 
-### 4. Отредактируйте файл `angie.conf`
+### 4. Отредактируйте файл `angie.env`
 
 Замените:
 - `<your_panel_domain>` на поддомен для панели (например, `panel.example.com`)
