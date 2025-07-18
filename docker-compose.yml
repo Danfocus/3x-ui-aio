@@ -10,7 +10,11 @@ services:
       - ./options-ssl-angie.conf:/etc/angie/options-ssl-angie.conf
       - 3x-ui-aio-volume:/var/lib/angie/acme/
       - ./web-stub/:/var/www/stub/
-    env_file: ./angie.env
+    env_file:
+      - path: ./angie.env
+        required: true
+      - path: ./angie_override.env
+        required: false
     networks:
       - 3x-ui-aio-network
     restart: unless-stopped
