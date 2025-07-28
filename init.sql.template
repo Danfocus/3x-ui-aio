@@ -1,0 +1,71 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+
+CREATE TABLE `users` (`id` integer PRIMARY KEY AUTOINCREMENT,`username` text,`password` text);
+INSERT INTO users VALUES(1,'${ADMIN_USER}','${ADMIN_PASS_HASH}');
+
+CREATE TABLE `inbounds` (`id` integer PRIMARY KEY AUTOINCREMENT,`user_id` integer,`up` integer,`down` integer,`total` integer,`remark` text,`enable` numeric,`expiry_time` integer,`listen` text,`port` integer,`protocol` text,`settings` text,`stream_settings` text,`tag` text,`sniffing` text,`allocate` text,CONSTRAINT `uni_inbounds_tag` UNIQUE (`tag`));
+INSERT INTO inbounds VALUES(1,1,0,0,0,'${DEFAULT_INBOUND_REMARK}',1,0,'',443,'vless',replace('{\n  "clients": [],\n  "decryption": "none",\n  "fallbacks": []\n}','\n',char(10)),replace('{\n  "network": "tcp",\n  "security": "reality",\n  "externalProxy": [\n    {\n      "forceTls": "same",\n      "dest": "${XRAY_DOMAIN}",\n      "port": 443,\n      "remark": ""\n    }\n  ],\n  "realitySettings": {\n    "show": false,\n    "xver": 2,\n    "dest": "angie:2443",\n    "serverNames": [\n      "${XRAY_DOMAIN}"\n    ],\n    "privateKey": "${XRAY_PIK}",\n "minClient": "",\n    "maxClient": "",\n    "maxTimediff": 0,\n    "shortIds": [\n      "${XRAY_SID}"\n    ],\n    "settings": {\n      "publicKey": "${XRAY_PBK}",\n      "fingerprint": "chrome",\n      "serverName": "",\n      "spiderX": "/"\n    }\n  },\n  "tcpSettings": {\n    "acceptProxyProtocol": true,\n    "header": {\n      "type": "none"\n    }\n  }\n}','\n',char(10)),'inbound-443',replace('{\n  "enabled": true,\n  "destOverride": [\n    "http",\n    "tls",\n    "quic",\n    "fakedns"\n  ],\n  "metadataOnly": false,\n  "routeOnly": false\n}','\n',char(10)),replace('{\n  "strategy": "always",\n  "refresh": 5,\n  "concurrency": 3\n}','\n',char(10)));
+
+CREATE TABLE `outbound_traffics` (`id` integer PRIMARY KEY AUTOINCREMENT,`tag` text,`up` integer DEFAULT 0,`down` integer DEFAULT 0,`total` integer DEFAULT 0,CONSTRAINT `uni_outbound_traffics_tag` UNIQUE (`tag`));
+
+CREATE TABLE `settings` (`id` integer PRIMARY KEY AUTOINCREMENT,`key` text,`value` text);
+INSERT INTO settings VALUES(1,'secret','${SECRET}');
+INSERT INTO settings VALUES(2,'webListen','${WEB_LISTEN}');
+INSERT INTO settings VALUES(3,'webDomain','${WEB_DOMAIN}');
+INSERT INTO settings VALUES(4,'webPort','${WEB_PORT}');
+INSERT INTO settings VALUES(5,'webCertFile','${WEB_CERT_FILE}');
+INSERT INTO settings VALUES(6,'webKeyFile','${WEB_KEY_FILE}');
+INSERT INTO settings VALUES(7,'webBasePath','${WEB_BASE_PATH}');
+INSERT INTO settings VALUES(8,'sessionMaxAge','${SESSION_MAX_AGE}');
+INSERT INTO settings VALUES(9,'pageSize','${PAGE_SIZE}');
+INSERT INTO settings VALUES(10,'expireDiff','${EXPIRE_DIFF}');
+INSERT INTO settings VALUES(11,'trafficDiff','${TRAFFIC_DIFF}');
+INSERT INTO settings VALUES(12,'remarkModel','${REMARK_MODEL}');
+INSERT INTO settings VALUES(13,'tgBotEnable','${TG_BOT_ENABLE}');
+INSERT INTO settings VALUES(14,'tgBotToken','${TG_BOT_TOKEN}');
+INSERT INTO settings VALUES(15,'tgBotProxy','${TG_BOT_PROXY}');
+INSERT INTO settings VALUES(16,'tgBotAPIServer','${TG_BOT_API_SERVER}');
+INSERT INTO settings VALUES(17,'tgBotChatId','${TG_BOT_CHAT_ID}');
+INSERT INTO settings VALUES(18,'tgRunTime','${TG_RUN_TIME}');
+INSERT INTO settings VALUES(19,'tgBotBackup','${TG_BOT_BACKUP}');
+INSERT INTO settings VALUES(20,'tgBotLoginNotify','${TG_BOT_LOGIN_NOTIFY}');
+INSERT INTO settings VALUES(21,'tgCpu','${TG_CPU}');
+INSERT INTO settings VALUES(22,'tgLang','${TG_LANG}');
+INSERT INTO settings VALUES(23,'timeLocation','${TIME_LOCATION}');
+INSERT INTO settings VALUES(24,'twoFactorEnable','${TWO_FACTOR_ENABLE}');
+INSERT INTO settings VALUES(25,'twoFactorToken','${TWO_FACTOR_TOKEN}');
+INSERT INTO settings VALUES(26,'subEnable','${SUB_ENABLE}');
+INSERT INTO settings VALUES(27,'subTitle','${SUB_TITLE}');
+INSERT INTO settings VALUES(28,'subListen','${SUB_LISTEN}');
+INSERT INTO settings VALUES(29,'subPort','${SUB_PORT}');
+INSERT INTO settings VALUES(30,'subPath','${SUB_PATH}');
+INSERT INTO settings VALUES(31,'subDomain','${SUB_DOMAIN}');
+INSERT INTO settings VALUES(32,'subCertFile','${SUB_CERT_FILE}');
+INSERT INTO settings VALUES(33,'subKeyFile','${SUB_KEY_FILE}');
+INSERT INTO settings VALUES(34,'subUpdates','${SUB_UPDATES}');
+INSERT INTO settings VALUES(35,'externalTrafficInformEnable','${EXT_TRAFFIC_INFORM_ENABLE}');
+INSERT INTO settings VALUES(36,'externalTrafficInformURI','${EXT_TRAFFIC_INFORM_URI}');
+INSERT INTO settings VALUES(37,'subEncrypt','${SUB_ENCRYPT}');
+INSERT INTO settings VALUES(38,'subShowInfo','${SUB_SHOW_INFO}');
+INSERT INTO settings VALUES(39,'subURI','${SUB_URI}');
+INSERT INTO settings VALUES(40,'subJsonPath','${SUB_JSON_PATH}');
+INSERT INTO settings VALUES(41,'subJsonURI','${SUB_JSON_URI}');
+INSERT INTO settings VALUES(42,'subJsonFragment','${SUB_JSON_FRAGMENT}');
+INSERT INTO settings VALUES(43,'subJsonNoises','${SUB_JSON_NOISES}');
+INSERT INTO settings VALUES(44,'subJsonMux','${SUB_JSON_MUX}');
+INSERT INTO settings VALUES(45,'subJsonRules','${SUB_JSON_RULES}');
+INSERT INTO settings VALUES(46,'datepicker','${DATEPICKER}');
+
+CREATE TABLE `inbound_client_ips` (`id` integer PRIMARY KEY AUTOINCREMENT,`client_email` text,`ips` text,CONSTRAINT `uni_inbound_client_ips_client_email` UNIQUE (`client_email`));
+CREATE TABLE `client_traffics` (`id` integer PRIMARY KEY AUTOINCREMENT,`inbound_id` integer,`enable` numeric,`email` text,`up` integer,`down` integer,`expiry_time` integer,`total` integer,`reset` integer DEFAULT 0,CONSTRAINT `fk_inbounds_client_stats` FOREIGN KEY (`inbound_id`) REFERENCES `inbounds`(`id`),CONSTRAINT `uni_client_traffics_email` UNIQUE (`email`));
+CREATE TABLE `history_of_seeders` (`id` integer PRIMARY KEY AUTOINCREMENT,`seeder_name` text);
+INSERT INTO history_of_seeders VALUES(1,'UserPasswordHash');
+
+DELETE FROM sqlite_sequence;
+INSERT INTO sqlite_sequence VALUES('users',1);
+INSERT INTO sqlite_sequence VALUES('history_of_seeders',1);
+INSERT INTO sqlite_sequence VALUES('inbounds',1);
+INSERT INTO sqlite_sequence VALUES('settings',46);
+
+COMMIT;

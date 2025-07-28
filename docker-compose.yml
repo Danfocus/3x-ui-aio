@@ -1,7 +1,23 @@
 services:
+  init-db:
+    image: alpine:latest
+    container_name: init-db
+    entrypoint: ["/bin/sh", "/entrypoint-init.sh"]
+    volumes:
+      - ./init.sql.template:/init.sql.template:ro
+      - ./entrypoint-init.sh:/entrypoint-init.sh:ro
+      - 3x-ui-aio-volume:/etc/x-ui/
+    env_file:
+      - path: .env
+    networks:
+      - 3x-ui-aio-network
+
   angie:
     image: docker.angie.software/angie:1.10.1-templated
     container_name: angie
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -10,11 +26,11 @@ services:
       - ./options-ssl-angie.conf:/etc/angie/options-ssl-angie.conf
       - 3x-ui-aio-volume:/var/lib/angie/acme/
       - ./web-stub/:/var/www/stub/
+      - ./wait-and-run.sh:/wait-and-run.sh
     env_file:
-      - path: ./angie.env
-        required: true
-      - path: ./angie_override.env
-        required: false
+      - path: .env
+    entrypoint: ["/bin/sh", "/wait-and-run.sh"]
+    command: ["/init"]
     networks:
       - 3x-ui-aio-network
     restart: unless-stopped
@@ -22,6 +38,9 @@ services:
   3x-ui:
     image: ghcr.io/mhsanaei/3x-ui:latest
     container_name: 3x-ui
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
     volumes:
       - 3x-ui-aio-volume:/etc/x-ui/
     environment:
